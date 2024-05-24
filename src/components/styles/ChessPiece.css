@@ -1,0 +1,11 @@
+.chess-piece {
+  font-size: 50px;
+  margin: 25px;
+}
+
+.chess-piece.white {
+  color: blue;
+}
+.chess-piece.black {
+  color: black;
+}
