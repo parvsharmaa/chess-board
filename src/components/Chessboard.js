@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
 import ChessSquare from './ChessSquare';
-import './styles/Chessboard.css';
-import { board } from './config/const';
+import { board } from '../services/const';
+import { isValidMove } from '../services/moves';
+import styled from 'styled-components';
+
+const Board = styled.div`
+  display: grid;
+  grid-template-columns: repeat(8, 100px);
+  grid-template-rows: repeat(8, 100px);
+  border: 3px solid black;
+`;
 
 const Chessboard = () => {
   const [squares, setSquares] = useState(board());
   const [selectedSquare, setSelectedSquare] = useState(null);
 
   const handleSquareClick = (index) => {
-    // set the square
     if (selectedSquare === null) {
-      if (squares[index] === null) {
+      if (squares[index] !== '') {
         setSelectedSquare(index);
       }
     } else {
       const newSquares = squares.slice();
-      newSquares[index] = newSquares[selectedSquare];
-      newSquares[selectedSquare] = null;
-      setSquares(newSquares);
+      if (isValidMove(selectedSquare, index, squares)) {
+        newSquares[index] = newSquares[selectedSquare];
+        newSquares[selectedSquare] = '';
+        setSquares(newSquares);
+      }
       setSelectedSquare(null);
     }
   };
@@ -36,44 +45,7 @@ const Chessboard = () => {
     );
   };
 
-  /* validates the moves for pieces */
-  const isValidMove = (from, to, squares) => {
-    const piece = squares[from];
-    const move = squares[to];
-
-    // coordinates to move
-    const fromX = from % 8;
-    const fromY = Math.floor(from / 8);
-    const toX = to % 8;
-    const toY = Math.floor(to / 8);
-    const direction = piece.color === 'black' ? -1 : 1;
-
-    if (piece.type === 'P') {
-      // forward
-      if (fromX === toX) {
-        if (fromY === toY + direction && move === null) {
-          return true;
-        }
-      }
-
-      if (
-        Math.abs(toX - fromX) === 1 &&
-        toY === fromY + direction &&
-        move &&
-        move.color !== piece.color
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  };
-
-  return (
-    <div className='chessboard'>
-      {Array.from({ length: 64 }, (_, i) => renderSquare(i))}
-    </div>
-  );
+  return <Board>{Array.from({ length: 64 }, (_, i) => renderSquare(i))}</Board>;
 };
 
 export default Chessboard;
